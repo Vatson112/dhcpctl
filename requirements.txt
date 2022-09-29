@@ -1,0 +1,4 @@
+click==8.0.4
+confuse==2.0.0
+macaddress==1.2.0
+pypureomapi==0.8

@@ -1,0 +1,7 @@
+---
+dhcp_servers:
+  - "dhcp01"
+  - "dhcp02"
+dhcp_port: 7911
+key_name: "defomapi"
+base64key: "default_key"
