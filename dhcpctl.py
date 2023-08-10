@@ -1,44 +1,33 @@
 #!./venv/bin/python
 import click
-#import click_config
 import confuse
-from  add_reservation import add_reservation
-from del_reservation import del_reservation
-# CONFIGS
+from  add_host import add_host
+from del_host import del_host
+from del_lease import del_lease
 
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
-
-def del_soft_lease_by_mac(omapi, host):
-    omapi.del_host('00:00:88:00:00:00')
-    print("Del soft reservation for mac: " +  str(host['mac']))
-
 @click.group(context_settings=CONTEXT_SETTINGS)
-
-# @click.pass_context
+@click.pass_context
 @click.option(
     '--config', '-c',
     help='Config, default path - ./config.yaml',
     type=click.Path(),
     default = "config.yaml"
 )
-def main(config):
-    init_config(config)
-    pass
+def main(ctx, config):
+    configfile = confuse.Configuration("dhcpctl", __name__)
+    configfile.set_file(config)
 
-def init_config(config_file):
-    global dhcp_servers, dhcp_port, key_name, base64key
+    ctx.obj['dhcp_servers']  = configfile['dhcp_servers'].get(list)
+    ctx.obj['dhcp_port'] = configfile['dhcp_port'].get(int)
+    ctx.obj['key_name'] = bytes(configfile['key_name'].get(str), 'utf-8')
+    ctx.obj['base64key'] = bytes(configfile['base64key'].get(str), 'utf-8')
 
-    config = confuse.Configuration("dhcpctl", __name__)
-    config.set_file(config_file)
-
-    dhcp_servers = config['dhcp_servers'].get(list)
-    dhcp_port = config['dhcp_port'].get(int)
-    key_name = bytes(config['key_name'].get(str), 'utf-8')
-    base64key = bytes(config['base64key'].get(str), 'utf-8')
 
 if __name__ == "__main__":
-    main.add_command(add_reservation)
-    main.add_command(del_reservation)
-    main()
+    main.add_command(add_host)
+    main.add_command(del_host)
+    # main.add_command(del_lease)
+    main(obj={})
